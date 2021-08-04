@@ -2,6 +2,7 @@
 #define MDICHILD_H
 
 #include <QWidget>
+#include <QTextEdit>
 
 class MdiChild : public QTextEdit
 {
@@ -27,7 +28,6 @@ private:
     void setCurrentFile(const QString &fileName);   //设置当前文件
     QString curFile;                            //保存当前文件路径
     bool isUntitled;                            //作为当前文件是否被保存到硬盘上的标志
-
 };
 
 #endif // MDICHILD_H

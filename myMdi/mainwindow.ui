@@ -26,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>539</width>
-     <height>23</height>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuF">
@@ -84,12 +84,24 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNew"/>
+   <addaction name="actionOpen"/>
+   <addaction name="separator"/>
+   <addaction name="actionSave"/>
+   <addaction name="actionSaceAs"/>
+   <addaction name="separator"/>
+   <addaction name="actionCut"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionPaste"/>
+   <addaction name="separator"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/new.png</normaloff>:/iamges/new.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/new.png</normaloff>:/images/images/new.png</iconset>
    </property>
    <property name="text">
     <string>新建文件</string>
@@ -100,8 +112,8 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/open.png</normaloff>:/iamges/open.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/open.png</normaloff>:/images/images/open.png</iconset>
    </property>
    <property name="text">
     <string>打开文件</string>
@@ -112,8 +124,8 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/save.png</normaloff>:/iamges/save.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/save.png</normaloff>:/images/images/save.png</iconset>
    </property>
    <property name="text">
     <string>保存</string>
@@ -124,8 +136,8 @@
   </action>
   <action name="actionSaceAs">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/saveAs.png</normaloff>:/iamges/saveAs.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/saveAs.png</normaloff>:/images/images/saveAs.png</iconset>
    </property>
    <property name="text">
     <string>另存为</string>
@@ -133,8 +145,8 @@
   </action>
   <action name="actionExit">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/exit.png</normaloff>:/iamges/exit.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/exit.png</normaloff>:/images/images/exit.png</iconset>
    </property>
    <property name="text">
     <string>退出</string>
@@ -142,8 +154,8 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/undo.png</normaloff>:/iamges/undo.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/undo.png</normaloff>:/images/images/undo.png</iconset>
    </property>
    <property name="text">
     <string>撤销</string>
@@ -154,8 +166,8 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/redo.png</normaloff>:/iamges/redo.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/redo.png</normaloff>:/images/images/redo.png</iconset>
    </property>
    <property name="text">
     <string>恢复</string>
@@ -166,8 +178,8 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/cut.png</normaloff>:/iamges/cut.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/cut.png</normaloff>:/images/images/cut.png</iconset>
    </property>
    <property name="text">
     <string>剪切</string>
@@ -178,8 +190,8 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/copy.png</normaloff>:/iamges/copy.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/copy.png</normaloff>:/images/images/copy.png</iconset>
    </property>
    <property name="text">
     <string>复制</string>
@@ -190,8 +202,8 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/paste.png</normaloff>:/iamges/paste.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/paste.png</normaloff>:/images/images/paste.png</iconset>
    </property>
    <property name="text">
     <string>粘贴</string>
@@ -222,8 +234,8 @@
   </action>
   <action name="actionNext">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/next.png</normaloff>:/iamges/next.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/next.png</normaloff>:/images/images/next.png</iconset>
    </property>
    <property name="text">
     <string>下一个</string>
@@ -234,8 +246,8 @@
   </action>
   <action name="actionPrevious">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/previous.png</normaloff>:/iamges/previous.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/previous.png</normaloff>:/images/images/previous.png</iconset>
    </property>
    <property name="text">
     <string>前一个</string>
@@ -243,8 +255,8 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset>
-     <normaloff>:/iamges/about.png</normaloff>:/iamges/about.png</iconset>
+    <iconset resource="images.qrc">
+     <normaloff>:/images/images/about.png</normaloff>:/images/images/about.png</iconset>
    </property>
    <property name="text">
     <string>关于</string>
@@ -257,6 +269,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>
