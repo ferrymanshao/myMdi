@@ -7,7 +7,7 @@
 #include <QFileDialog>
 #include <QCloseEvent>
 #include <QPushButton>
-
+#include <QString>
 
 MdiChild::MdiChild(QWidget *parent)
 {
@@ -36,8 +36,8 @@ bool MdiChild::loadFile(const QString &fileName)
     QFile file(fileName);
     if(!file.open(QFile::WriteOnly | QFile::Text))
     {
-        QMessageBox::warning(this,tr.fromUtf8("多文档编辑器"),
-                             tr.fromUtf8("无法读取文件%1:\n%2.")
+        QMessageBox::warning(this,QString::fromUtf8("多文档编辑器"),
+                             QString::fromUtf8("无法读取文件%1:\n%2.")
                              .arg(fileName).arg(file.errorString()));
         return false;
     }
@@ -71,7 +71,7 @@ bool MdiChild::save()
 
 bool MdiChild::saveAs()
 {
-    QString fileName = QFileDialog::getSaveFileName(this,tr.fromUtf8("另存为"),curFile);
+    QString fileName = QFileDialog::getSaveFileName(this,QString::fromUtf8("另存为"),curFile);
     if(fileName.isEmpty())
         return false;
     else
@@ -83,8 +83,8 @@ bool MdiChild::saveFile(const QString &fileName)
     QFile file(fileName);
     if(!file.open(QFile::WriteOnly | QFile::Text))
     {
-        QMessageBox::warning(this,tr.fromUtf8("多文档编辑器"),
-                             tr.fromUtf8("无法写入文件%1:\n%2.")
+        QMessageBox::warning(this,QString::fromUtf8("多文档编辑器"),
+                             QString::fromUtf8("无法写入文件%1:\n%2.")
                              .arg(fileName).arg(file.errorString()));
         return false;
     }
@@ -119,6 +119,34 @@ void MdiChild::documentWasModified()
     //根据文档的isModified()函数的返回值，判断编辑器内容是否被更改了
     //如果被更改了，就要在设置了[*]号的地方显示“*”号，这里会在窗口标题中显示
     setWindowModified(document()->isModified());
+}
+
+bool MdiChild::maybeSave()
+{
+    //如果文档被更改过
+    if(document()->isModified())
+    {
+        QMessageBox box;
+        box.setWindowTitle(QString::fromUtf8("多文档编辑器"));
+        box.setText(QString::fromUtf8("是否保存对“%1”的更改?")
+                    .arg(userFriendlyCurrentFile()));
+        box.setIcon(QMessageBox::Warning);
+        //添加按钮，QMessageBox::YesRole可以表面这个按钮的行为
+        QPushButton *yesBtn = box.addButton(QString::fromUtf8("是(&Y)")
+                                            ,QMessageBox::YesRole);
+        box.addButton(QString::fromUtf8("否(&N)"),QMessageBox::NoRole);
+        QPushButton *cancelBtn = box.addButton(QString::fromUtf8("取消")
+                                               ,QMessageBox::RejectRole);
+        //弹出对话框，让用户选择是否保存修改，或者取消关闭操作
+        box.exec();
+        //如果用户选择是，则返回保存操作的结果；如果选择取消，则返回false
+        if(yesBtn == box.clickedButton())
+            return save();
+        else if(cancelBtn ==  box.clickedButton())
+            return false;
+    }
+    //如果文档没有更改过，直接返回true
+    return true;
 }
 
 void MdiChild::setCurrentFile(const QString &fileName)
