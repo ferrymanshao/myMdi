@@ -34,7 +34,7 @@ void MdiChild::newFile()
 bool MdiChild::loadFile(const QString &fileName)
 {
     QFile file(fileName);
-    if(!file.open(QFile::WriteOnly | QFile::Text))
+    if(!file.open(QFile::WriteOnly | QFile::ReadOnly | QFile::Text))
     {
         QMessageBox::warning(this,QString::fromUtf8("多文档编辑器"),
                              QString::fromUtf8("无法读取文件%1:\n%2.")
@@ -47,7 +47,7 @@ bool MdiChild::loadFile(const QString &fileName)
     //设置鼠标状态为等待状态
     QApplication::setOverrideCursor(Qt::WaitCursor);
     //读取文件全部内容，并添加到编辑器中
-    setPlainText(in.readAll());
+    setPlainText(QString::fromUtf8(in.readAll().toLocal8Bit()));
     //回复鼠标状态
     QApplication::restoreOverrideCursor();
     //设置当前文件
