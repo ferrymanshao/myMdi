@@ -8,6 +8,7 @@
 #include <QCloseEvent>
 #include <QPushButton>
 #include <QString>
+#include <QMenu>
 
 MdiChild::MdiChild(QWidget *parent)
 {
@@ -112,6 +113,39 @@ void MdiChild::closeEvent(QCloseEvent *event)
     {
         event->ignore();
     }
+}
+
+void MdiChild::contextMenuEvent(QContextMenuEvent *e)
+{
+    //创建菜单，并向其中添加动作
+    QMenu *menu = new QMenu;
+    QAction *undo = menu->addAction(QString::fromUtf8("撤销(&U)"),this,
+                                    SLOT(undo()),QKeySequence::Undo);
+    undo->setEnabled(document()->isUndoAvailable());
+    QAction *redo = menu->addAction(QString::fromUtf8("恢复(&R)"),this,
+                                    SLOT(redo()),QKeySequence::Redo);
+    redo->setEnabled(document()->isRedoAvailable());
+    menu->addSeparator();
+    QAction *cut = menu->addAction(QString::fromUtf8("剪切(&T)"),this,
+                                   SLOT(cut()),QKeySequence::Cut);
+    cut->setEnabled(textCursor().hasSelection());
+    QAction *copy = menu->addAction(QString::fromUtf8("复制(&C)"),this,
+                                   SLOT(copy()),QKeySequence::Copy);
+    copy->setEnabled(textCursor().hasSelection());
+    QAction *paste = menu->addAction(QString::fromUtf8("粘贴(&V)"),this,
+                                   SLOT(paste()),QKeySequence::Paste);
+    QAction *clear = menu->addAction(QString::fromUtf8("清空"),this,SLOT(clear()));
+    clear->setEnabled(!document()->isEmpty());
+    menu->addSeparator();
+    QAction *select = menu->addAction(QString::fromUtf8("全选"),this,
+                                   SLOT(selectAll()),QKeySequence::SelectAll);
+    select->setEnabled(!document()->isEmpty());
+
+    //获取鼠标的位置
+    menu->exec(e->globalPos());
+
+    //最后销毁这个菜单
+    delete menu;
 }
 
 void MdiChild::documentWasModified()

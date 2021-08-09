@@ -4,6 +4,9 @@
 #include <QMdiSubWindow>
 #include <QFileDialog>
 #include <QSignalMapper>
+#include <QSettings>
+#include <QCloseEvent>
+#include <QLabel>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -27,6 +30,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //更新窗口菜单，并且设置当窗口菜单将要显示的时候更新窗口菜单
     updataWindowMenu();
     connect(ui->menuW,SIGNAL(aboutToShow()),this,SLOT(updataWindowMenu()));
+
+    readSettings();
+
+    initWindow();
 }
 
 MainWindow::~MainWindow()
@@ -131,6 +138,8 @@ MdiChild *MainWindow::creatMdiChild()
     //根据QTextDocument类的是否可以撤销恢复信号设置撤销恢复动作是否可用
     connect(child->document(),SIGNAL(undoAvailable(bool)),ui->actionUndo,SLOT(setEnabled(bool)));
     connect(child->document(),SIGNAL(redoAvailable(bool)),ui->actionRedo,SLOT(setEnabled(bool)));
+    //每当编辑器中的光标位置改变，就重新显示行号和列号
+    connect(child,SIGNAL(cursorPositionChanged()),this,SLOT(showTextRowAndCol()));
     return child;
 }
 
@@ -140,6 +149,17 @@ void MainWindow::setActiveSubWindow(QWidget *window)
     if(!window)
         return;
     ui->mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow*>(window));
+}
+
+void MainWindow::showTextRowAndCol()
+{
+    if(activeMdiChild())
+    {
+        //因为获取的行号和列号都是从0开始的，所以我们这里进行了加1
+        int rowNum = activeMdiChild()->textCursor().blockNumber() + 1;
+        int colNum = activeMdiChild()->textCursor().columnNumber() + 1;
+        ui->statusBar->showMessage(QString::fromUtf8("%1行 %2列").arg(rowNum).arg(colNum));
+    }
 }
 
 MdiChild *MainWindow::activeMdiChild()
@@ -162,6 +182,59 @@ QMdiSubWindow *MainWindow::findMdiChild(const QString &fileName)
     }
 
     return 0;
+}
+
+void MainWindow::readSettings()
+{
+    QSettings setting("ferryman","myMdi");
+    QPoint pos = setting.value("pos",QPoint(200,200)).toPoint();
+    QSize size = setting.value("size",QSize(400,400)).toSize();
+    move(pos);
+    resize(size);
+}
+
+void MainWindow::writeSettings()
+{
+    QSettings setting("ferryman","myMdi");
+    //写入位置信息和大小信息
+    setting.setValue("pso",pos());
+    setting.setValue("size",size());
+}
+
+void MainWindow::initWindow()
+{
+    setWindowTitle(QString::fromUtf8("多文档编辑器"));
+    //在工具栏上右击时，可以关闭工具栏
+    ui->mainToolBar->setWindowTitle(QString::fromUtf8("工具栏"));
+    //当多文档区域的内容超出可视区域后，出现滚动条
+    ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    ui->mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
+    ui->statusBar->showMessage(QString::fromUtf8("欢迎使用多文档编辑器"));
+    QLabel *label = new QLabel(this);
+    label->setFrameStyle(QFrame::Box | QFrame::Sunken);
+    label->setText("<a href=\"https://www.baidu.com/s?wd=%E4%BD%A0%E6%98%AF%E7%8C%AA%E5%90%97&rsv_spt=1&rsv_iqid=0x96d29ee000012f46&issp=1&f=8&rsv_bp=1&rsv_idx=2&ie=utf-8&tn=27082910_5_hao_pg&rsv_enter=1&rsv_dl=tb&rsv_sug3=13&rsv_sug1=5&rsv_sug7=100&rsv_sug2=0&rsv_btype=i&inputT=3424&rsv_sug4=3424\">bangzhu</a>");
+    //标签为富文本
+    label->setTextFormat(Qt::RichText);
+    label->setOpenExternalLinks(true);
+    ui->statusBar->addPermanentWidget(label);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    //先执行多文档区域的关闭操作
+    ui->mdiArea->closeAllSubWindows();
+    //如果还有窗口没有关闭，则忽略该事件
+    if(ui->mdiArea->currentSubWindow())
+    {
+        event->ignore();
+    }
+    else
+    {
+        //在关闭前写入窗口设置
+        writeSettings();
+        event->accept();
+    }
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -236,4 +309,10 @@ void MainWindow::on_actionClose_triggered()
 void MainWindow::on_actionCloseAll_triggered()
 {
     ui->mdiArea->closeAllSubWindows();
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    //等价于QApplication::closeAllWindows()
+    qApp->closeAllWindows();
 }

@@ -20,6 +20,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event);        //关闭事件
+    void contextMenuEvent(QContextMenuEvent *e);    //右键菜单事件
 
 private slots:
     void documentWasModified();                 //文档被更改时，窗口显示更改状态标志
