@@ -3,6 +3,7 @@
 #include "mdichild.h"
 #include <QMdiSubWindow>
 #include <QFileDialog>
+#include <QSignalMapper>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -18,6 +19,14 @@ MainWindow::MainWindow(QWidget *parent) :
     //当有活动窗口时更新菜单
     connect(ui->mdiArea,SIGNAL(subWindowActivated(QMdiSubWindow*)),this,SLOT(updataMenu()));
 
+    //创建信号映射器
+    windowMapper = new QSignalMapper(this);
+    //映射器重新发射信号，根据信号设置活动窗口
+    connect(windowMapper,SIGNAL(mapped(QWidget*)),this,SLOT(setActiveSubWindow(QWidget*)));
+
+    //更新窗口菜单，并且设置当窗口菜单将要显示的时候更新窗口菜单
+    updataWindowMenu();
+    connect(ui->menuW,SIGNAL(aboutToShow()),this,SLOT(updataWindowMenu()));
 }
 
 MainWindow::~MainWindow()
@@ -28,8 +37,6 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionNew_triggered()
 {
     MdiChild *child = creatMdiChild();
-    //多文档区域添加子窗口
-    ui->mdiArea->addSubWindow(child);
     //新建文件
     child->newFile();
     child->show();
@@ -63,6 +70,53 @@ void MainWindow::updataMenu()
     //有活动窗口且文档有恢复操作时恢复动作可用
     ui->actionRedo->setEnabled(activeMdiChild()
                                && activeMdiChild()->document()->isRedoAvailable());
+}
+
+void MainWindow::updataWindowMenu()
+{
+    //先清空菜单，然后再添加各个菜单动作
+    ui->menuW->clear();
+    ui->menuW->addAction(ui->actionClose);
+    ui->menuW->addAction(ui->actionCloseAll);
+    ui->menuW->addSeparator();
+    ui->menuW->addAction(ui->actionTile);
+    ui->menuW->addAction(ui->actionCascade);
+    ui->menuW->addSeparator();
+    ui->menuW->addAction(ui->actionNext);
+    ui->menuW->addAction(ui->actionPrevious);
+    ui->menuW->addAction(actionSeparator);
+
+    //如果有活动窗口，则显示间隔器
+    QList<QMdiSubWindow*> windows = ui->mdiArea->subWindowList();
+    actionSeparator->setVisible(!windows.isEmpty());
+
+    //遍历各个子窗口
+    for(int i = 0; i < windows.size(); ++i)
+    {
+        MdiChild *child = qobject_cast<MdiChild*>(windows.at(i)->widget());
+        QString text;
+        //如果窗口数小于9，则设置编号为快捷键
+        if(i < 9)
+        {
+            text = QString::fromUtf8("&%1 %2").arg(i+1)
+                    .arg(child->userFriendlyCurrentFile());
+        }
+        else
+        {
+            text = QString::fromUtf8("%1 %2").arg(i+1)
+                    .arg(child->userFriendlyCurrentFile());
+        }
+        //添加动作到菜单，设置动作可以选择
+        QAction *action = ui->menuW->addAction(text);
+        action->setCheckable(true);
+        //设置当前活动窗口动作为选中状态
+        action->setChecked(child == activeMdiChild());
+        //关联动作的触发信号到信号映射器的map()槽，这个槽会发射mappde()信号
+        connect(action,SIGNAL(triggered()),windowMapper,SLOT(map()));
+        //将动作与相应的窗口部件进行映射
+        //在发射mapped()信号时就会以这个窗口部件为参数
+        windowMapper->setMapping(action,windows.at(i));
+    }
 }
 
 MdiChild *MainWindow::creatMdiChild()
@@ -138,30 +192,48 @@ void MainWindow::on_actionOpen_triggered()
     }
 }
 
+void MainWindow::on_actionSave_triggered()
+{
+    if(activeMdiChild() && activeMdiChild()->save())
+        ui->statusBar->showMessage(QString::fromUtf8("文件保存成功"),2000);
+}
 
+void MainWindow::on_actionUndo_triggered()
+{
+    if(activeMdiChild())
+        activeMdiChild()->undo();
+}
 
+void MainWindow::on_actionRedo_triggered()
+{
+    if(activeMdiChild())
+        activeMdiChild()->redo();
+}
 
+void MainWindow::on_actionCut_triggered()
+{
+    if(activeMdiChild())
+        activeMdiChild()->cut();
+}
 
+void MainWindow::on_actionCopy_triggered()
+{
+    if(activeMdiChild())
+        activeMdiChild()->copy();
+}
 
+void MainWindow::on_actionPaste_triggered()
+{
+    if(activeMdiChild())
+        activeMdiChild()->paste();
+}
 
+void MainWindow::on_actionClose_triggered()
+{
+    ui->mdiArea->closeActiveSubWindow();
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void MainWindow::on_actionCloseAll_triggered()
+{
+    ui->mdiArea->closeAllSubWindows();
+}

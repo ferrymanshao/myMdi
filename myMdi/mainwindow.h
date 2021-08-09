@@ -9,6 +9,7 @@ class MainWindow;
 
 class MdiChild;
 class QMdiSubWindow;
+class QSignalMapper;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -24,14 +25,31 @@ private:
 private slots:
     void on_actionNew_triggered();
     void updataMenu();              //更新菜单
+    void updataWindowMenu();        //更新窗口菜单
     MdiChild *creatMdiChild();      //创建子窗口
     void setActiveSubWindow(QWidget *window);       //设置活动窗口
-
     void on_actionOpen_triggered();
+
+    void on_actionSave_triggered();
+
+    void on_actionUndo_triggered();
+
+    void on_actionRedo_triggered();
+
+    void on_actionCut_triggered();
+
+    void on_actionCopy_triggered();
+
+    void on_actionPaste_triggered();
+
+    void on_actionClose_triggered();
+
+    void on_actionCloseAll_triggered();
 
 private:
     Ui::MainWindow *ui;
     QAction *actionSeparator;       //间隔器
+    QSignalMapper *windowMapper;    //信号映射器
 };
 
 #endif // MAINWINDOW_H
